@@ -13,10 +13,10 @@ class ScribeIt
     @config = config
     @sources = []
     @scribe = Scribe.new
+    @logger = ScribeIt::Log.new
   end
 
   def register
-
     if !@config.has_key? "sources"
       raise "Config error - no sources defined"
     end
@@ -32,7 +32,8 @@ class ScribeIt
       files = [files] if !files.is_a? Array
 
       files.each do |f|
-        s = ScribeIt::Source.new(f, type) { |event| receive(event) }
+        @logger.debug("Adding new source #{f} to category #{cat}")
+        s = ScribeIt::Source.new(f, cat) { |event| receive(event) }
         s.register
         @sources << s
       end
@@ -78,6 +79,7 @@ class ScribeIt
   protected
 
   def fire(event)
+    @logger.debug("Firing a new event at scribe for #{event.inspect}")
     @scribe.log(event.data, event.category)
   end
 
