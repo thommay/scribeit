@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+
+$: << File.dirname($0) + '/../lib'
+
+require 'rubygems'
+require 'eventmachine'
+require 'yaml'
+require 'optparse'
+require 'scribe'
+
+conf = '/etc/scribeit.conf'
+
+opts = OptionParser.new do |opts|
+  opts.banner = "Usage: #{$0} [options]"
+
+  opts.on("-f CONFIGFILE", "--config CONFIGFILE", "Load scribeit's config from the specified file") do |arg|
+    conf = arg
+  end
+end
+
+opts.parse!
+if conf == '' or conf.nil?
+  raise "No config file given"
+end
+
+if !File.exist? conf
+  $stderr.puts "Config file #{conf} does not exist!"
+  exit 1
+end
+
+begin
+  config = YAML::load_file(conf)
+rescue => e
+  $stderr.puts "Loading config file #{conf} failed: #{e}"
+  exit 1
+end
+
+scr = ScribeIt.new(config)
+scr.run
