@@ -1,5 +1,6 @@
 require 'eventmachine'
 require 'eventmachine-tail'
+require 'scribe'
 require 'scribeit/source'
 require 'scribeit/log'
 
@@ -11,6 +12,7 @@ class ScribeIt
   def initialize(config)
     @config = config
     @sources = []
+    @scribe = Scribe.new
   end
 
   def register
@@ -74,6 +76,10 @@ class ScribeIt
   end
 
   protected
+
+  def fire(event)
+    @scribe.log(event.data, event.category)
+  end
 
   def receive(event)
     if !event.cancelled?
