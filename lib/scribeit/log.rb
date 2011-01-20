@@ -2,16 +2,15 @@ require 'logger'
 
 class ScribeIt
   class Log < Logger
+    attr_reader :level
 
-    def initialize(*args)
-      super(*args)
-      self.level = $DEBUG ? Logger::DEBUG : Logger::INFO
-      @formatter.progname = File.basename $0
+    def initialize(name)
+      super(name)
+      @level = $DEBUG ? Logger::DEBUG : Logger::INFO
     end
 
     def level=(level)
       super(level)
-      @formatter.level = level
     end
 
   end

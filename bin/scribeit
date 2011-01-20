@@ -7,6 +7,7 @@ require 'eventmachine'
 require 'yaml'
 require 'optparse'
 require 'scribe'
+require 'scribeit'
 
 conf = '/etc/scribeit.conf'
 

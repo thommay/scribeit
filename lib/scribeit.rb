@@ -13,7 +13,7 @@ class ScribeIt
     @config = config
     @sources = []
     @scribe = Scribe.new
-    @logger = ScribeIt::Log.new
+    @logger = ScribeIt::Log.new STDERR
   end
 
   def register
@@ -23,8 +23,9 @@ class ScribeIt
 
     sources = @config["sources"]
     sources.each do |source|
-      if source.is_a? Hash
-        cat, files = value
+      puts source.inspect
+      if source.is_a? Array or source.is_a? Hash
+        cat, files = source
       else
         raise "Config error - no category for file: #{files.inspect}"
       end
@@ -33,7 +34,7 @@ class ScribeIt
 
       files.each do |f|
         @logger.debug("Adding new source #{f} to category #{cat}")
-        s = ScribeIt::Source.new(f, cat) { |event| receive(event) }
+        s = ScribeIt::Source.new(f, cat) { |event| fire(event) }
         s.register
         @sources << s
       end
@@ -54,7 +55,7 @@ class ScribeIt
   end
 
   def register_signal_handler
-    @sigals = EventMachine::Channel.new
+    @signals = EventMachine::Channel.new
 
     Signal.trap("INT") do
       @signals.push(:INT)
@@ -80,13 +81,7 @@ class ScribeIt
 
   def fire(event)
     @logger.debug("Firing a new event at scribe for #{event.inspect}")
-    @scribe.log(event.data, event.category)
-  end
-
-  def receive(event)
-    if !event.cancelled?
-      fire(event)
-    end
+    @scribe.log(event[:event], event[:category])
   end
 
 end
