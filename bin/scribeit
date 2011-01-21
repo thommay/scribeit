@@ -31,6 +31,21 @@ end
 
 begin
   config = YAML::load_file(conf)
+  if config["dirs"]
+    config["dirs"].each do |dir|
+      Dir.glob("#{dir}/*.yml") do |fn|
+        config.merge!(YAML::load_file(fn)) do  |k,r1,r2| 
+          r1.merge(r2) do |k,r1,r2| 
+            if r1.respond_to? "merge" 
+              r1.merge r2
+            else
+              r1 + r2 if r1.is_a? Array
+            end
+          end
+        end
+      end
+    end
+  end
 rescue => e
   $stderr.puts "Loading config file #{conf} failed: #{e}"
   exit 1
