@@ -4,4 +4,4 @@ source "http://rubygems.org"
 # gem "rails"
 
 gem "eventmachine-tail"
-gem "scribe"
+gem "scribe", "> 0.2.2"
