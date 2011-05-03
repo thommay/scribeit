@@ -44,6 +44,7 @@ class ScribeIt
   end
 
   def run(&block)
+    EventMachine.epoll
     EventMachine.run do
       self.register
       yield if block_given?
